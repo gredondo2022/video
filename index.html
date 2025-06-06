@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Vistas con Video, Audio y Buscador</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('https://c4.wallpaperflare.com/wallpaper/242/76/853/astronaut-4k-download-wallpaper-preview.jpg');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .views-counter {
+            font-size: 2em;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .search-box {
+            margin-top: 20px;
+        }
+        .search-box input {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+        .search-box button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+        .media-section {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 14px;
+            display: inline-block;
+        }
+        .audio-controls, .video-controls {
+            margin: 10px 0;
+        }
+        .volume-slider {
+            vertical-align: middle;
+            width: 100px;
+        }
+        .media-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        video {
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+        @media (max-width: 500px) {
+            .container, .media-section {
+                width: 98vw;
+                left: 1vw;
+                transform: none;
+            }
+            video {
+                max-width: 98vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido a mi Sitio Web</h1>
+        <div class="views-counter" id="viewsCounter">
+            Cargando visitas...
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar o ingresar URL">
+            <button onclick="redirect()">Ir</button>
+        </div>
+
+        <div class="media-section">
+            <div class="media-title">Video de Presentación</div>
+            <!-- Puedes cambiar el src por el video que tú desees en línea (formato mp4 recomendado) -->
+            <video id="mainVideo" src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+            <div class="video-controls">
+                <button id="playPauseBtn">Reproducir</button>
+            </div>
+        </div>
+
+        <div class="media-section">
+            <div class="media-title">Música de Fondo</div>
+            <audio id="bgAudio" src="https://github.com/gredondo2022/index.html/raw/main/Todo%20va%20a%20estar%20bien%20(Be%20Alright)%20-%20(PISTAKARAOKE%20ORIGINAL)%20%20Redimi2%2C%20Evan%20Craft.mp3" loop></audio>
+            <div class="audio-controls">
+                <button id="audioPlayPauseBtn">Reproducir</button>
+                <input id="audioVolume" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+                <span id="audioVolumeValue">50%</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Contador de vistas
+        const viewsCounterElement = document.getElementById('viewsCounter');
+        const viewsKey = 'page_views';
+        function updateViews() {
+            let views = localStorage.getItem(viewsKey);
+            if (!views) views = 0;
+            views = parseInt(views) + 1;
+            localStorage.setItem(viewsKey, views);
+            viewsCounterElement.textContent = `Visitas: ${views}`;
+        }
+        updateViews();
+
+        // Buscador/redirección
+        function redirect() {
+            const input = document.getElementById('searchInput').value;
+            if (input) {
+                let url = input;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+                }
+                window.open(url, '_blank');
+            } else {
+                alert('Por favor, ingresa un término de búsqueda o una URL.');
+            }
+        }
+
+        // Video: play/pause control
+        const video = document.getElementById('mainVideo');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        playPauseBtn.addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+                playPauseBtn.textContent = 'Pausar';
+            } else {
+                video.pause();
+                playPauseBtn.textContent = 'Reproducir';
+            }
+        });
+        video.addEventListener('pause', () => playPauseBtn.textContent = 'Reproducir');
+        video.addEventListener('play', () => playPauseBtn.textContent = 'Pausar');
+
+        // Audio: play/pause and volume control
+        const audio = document.getElementById('bgAudio');
+        const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
+        const audioVolume = document.getElementById('audioVolume');
+        const audioVolumeValue = document.getElementById('audioVolumeValue');
+
+        audioVolume.addEventListener('input', function() {
+            audio.volume = audioVolume.value;
+            audioVolumeValue.textContent = `${Math.round(audio.volume * 100)}%`;
+        });
+        audioPlayPauseBtn.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                audioPlayPauseBtn.textContent = 'Pausar';
+            } else {
+                audio.pause();
+                audioPlayPauseBtn.textContent = 'Reproducir';
+            }
+        });
+        // Cambia el texto del botón según el estado
+        audio.addEventListener('pause', () => audioPlayPauseBtn.textContent = 'Reproducir');
+        audio.addEventListener('play', () => audioPlayPauseBtn.textContent = 'Pausar');
+        // Inicia con volumen al 50%
+        audio.volume = 0.5;
+        audioVolumeValue.textContent = '50%';
+    </script>
+</body>
+</html>
